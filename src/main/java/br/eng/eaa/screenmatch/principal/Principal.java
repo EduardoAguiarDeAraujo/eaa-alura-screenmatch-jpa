@@ -3,6 +3,7 @@ package br.eng.eaa.screenmatch.principal;
 import br.eng.eaa.screenmatch.model.DadosSerie;
 import br.eng.eaa.screenmatch.model.DadosTemporada;
 import br.eng.eaa.screenmatch.model.Serie;
+import br.eng.eaa.screenmatch.repository.SerieRepository;
 import br.eng.eaa.screenmatch.service.ConsumoApi;
 import br.eng.eaa.screenmatch.service.ConverteDados;
 
@@ -20,6 +21,13 @@ public class Principal {
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apikey=6585022c";
     private List<DadosSerie> dadosSeries = new ArrayList<>();
+    private SerieRepository serieRepository;
+
+
+    public Principal(SerieRepository serieRepository) {
+        this.serieRepository = serieRepository;
+    }
+
 
     public void exibeMenu() {
         var opcao = -1;
@@ -59,6 +67,8 @@ public class Principal {
         DadosSerie dados = getDadosSerie();
         dadosSeries.add(dados);
 //        System.out.println(dados);
+        Serie serie = new Serie(dados);
+        serieRepository.save(serie);
     }
 
     private DadosSerie getDadosSerie() {
@@ -81,10 +91,14 @@ public class Principal {
         temporadas.forEach(System.out::println);
     }
     private void listarSeriesBuscadas() {
-        List<Serie> series = new ArrayList<>();
-        series = dadosSeries.stream()
-                .map(d -> new Serie(d))
-                .collect(Collectors.toList());
+//        List<Serie> series = new ArrayList<>();
+//        series = dadosSeries.stream()
+//                .map(d -> new Serie(d))
+//                .collect(Collectors.toList());
+//        series.stream()
+//                .sorted(Comparator.comparing(Serie::getGenero))
+//                .forEach(System.out::println);
+        List<Serie> series = serieRepository.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))
                 .forEach(System.out::println);
