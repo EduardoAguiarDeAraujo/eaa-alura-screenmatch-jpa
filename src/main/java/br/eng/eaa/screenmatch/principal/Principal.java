@@ -1,9 +1,6 @@
 package br.eng.eaa.screenmatch.principal;
 
-import br.eng.eaa.screenmatch.model.DadosSerie;
-import br.eng.eaa.screenmatch.model.DadosTemporada;
-import br.eng.eaa.screenmatch.model.Episodio;
-import br.eng.eaa.screenmatch.model.Serie;
+import br.eng.eaa.screenmatch.model.*;
 import br.eng.eaa.screenmatch.repository.SerieRepository;
 import br.eng.eaa.screenmatch.service.ConsumoApi;
 import br.eng.eaa.screenmatch.service.ConverteDados;
@@ -35,6 +32,10 @@ public class Principal {
                     1 - Buscar séries
                     2 - Buscar episódios
                     3 - Listar séries
+                    4 - Buscar série por título
+                    5 - Buscar série por ator
+                    6 - Buscar Top 5 series
+                    7 - Buscar série por categoria
                                         
                     0 - Sair                                 
                     """;
@@ -53,6 +54,18 @@ public class Principal {
                 case 3:
                     listarSeriesBuscadas();
                     break;
+                case 4:
+                    buscarSeriePorTitulo();
+                    break;
+                case 5:
+                    buscarSeriePorAtor();
+                    break;
+                case 6:
+                    buscarTop5Series();
+                    break;
+                case 7:
+                    buscarSeriePorCategoria();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -60,6 +73,48 @@ public class Principal {
                     System.out.println("Opção inválida");
             }
         }
+    }
+
+    private void buscarSeriePorCategoria() {
+        System.out.println("Digite o nome da categoria para busca");
+        var nomeCategoria = leitura.nextLine();
+        var categoria = Categoria.fromPortugues(nomeCategoria);
+        List<Serie> series = serieRepository.findByGenero(categoria);
+        if (series.isEmpty()) {
+            System.out.println("Série não encontrada");
+        } else {
+            series.forEach(s -> System.out.println(s.getTitulo() + " - " + s.getGenero()));
+        }
+    }
+
+    private void buscarTop5Series() {
+        List<Serie> series = serieRepository.findTop5ByOrderByAvaliacaoDesc();
+        series.forEach(s -> System.out.println(s.getTitulo() + " - " + s.getAvaliacao()));
+    }
+
+    private void buscarSeriePorAtor() {
+        System.out.println("Digite o nome do ator para busca");
+        var nomeAtor = leitura.nextLine();
+        System.out.println("Digite a avaliação mínima");
+        var avaliacao = leitura.nextDouble();
+        List<Serie> series = serieRepository.findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeAtor, avaliacao);
+        if (series.isEmpty()) {
+            System.out.println("Série não encontrada");
+        } else {
+            series.forEach(s -> System.out.println(s.getTitulo()+ " - " + s.getAvaliacao()) );
+        }
+    }
+
+    private void buscarSeriePorTitulo() {
+        System.out.println("Digite o nome da série para busca");
+        var nomeSerie = leitura.nextLine();
+        Optional<Serie> serie = serieRepository.findByTituloContainingIgnoreCase(nomeSerie);
+        if (serie.isPresent()) {
+            System.out.println("Dados da serie: " + serie.get());
+        } else {
+            System.out.println("Série não encontrada");
+        }
+
     }
 
     private void buscarSerieWeb() {
