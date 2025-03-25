@@ -125,4 +125,6 @@ public class Serie {
     public void setSinopse(String sinopse) {
         this.sinopse = sinopse;
     }
+
+
 }
